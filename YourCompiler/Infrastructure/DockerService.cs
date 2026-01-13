@@ -12,14 +12,14 @@ namespace YourCompiler.Infrastructure
             // Temporary folder
             string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             Directory.CreateDirectory(tempDir);
-            string filePath = Path.Combine(tempDir, "main.py");
+            string filePath = Path.Combine(tempDir, $"{details.FileName}.{details.LanguageExtension}");
             await System.IO.File.WriteAllTextAsync(filePath, details.code);
 
             // Create container
             var container = await client.Containers.CreateContainerAsync(new CreateContainerParameters
             {
-                Image = "python:3.12",
-                Cmd = new List<string> { "python", "/app/main.py" },
+                Image = details.ImageName,
+                Cmd = details.ExecutionCommand,
                 AttachStdout = true,
                 AttachStderr = true,
                 HostConfig = new HostConfig
@@ -38,7 +38,7 @@ namespace YourCompiler.Infrastructure
             // Get logs after it finished
             var logs = await client.Containers.GetContainerLogsAsync(
                 container.ID,
-                false, // tty: false, since the container was not created with TTY
+                false,
                 new ContainerLogsParameters
                 {
                     ShowStdout = true,
