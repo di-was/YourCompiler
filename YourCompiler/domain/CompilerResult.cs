@@ -1,4 +1,4 @@
-﻿namespace YourCompiler.domain
+﻿namespace YourCompiler.Domain
 {
     public record CompilerResult(
         string? Output,

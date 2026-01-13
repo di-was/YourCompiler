@@ -1,6 +1,6 @@
-﻿using YourCompiler.domain;
+﻿using YourCompiler.Domain;
 
-namespace YourCompiler.domain
+namespace YourCompiler.Domain
 {
     public interface ICompiler
     {
