@@ -48,7 +48,7 @@ namespace YourCompiler.Infrastructure
 
             var (stdout, stderr) = await logs.ReadOutputToEndAsync(CancellationToken.None);
 
-            // Delete container manually
+            // Delete container
             await client.Containers.RemoveContainerAsync(container.ID, new ContainerRemoveParameters());
 
             string output = stdout + stderr;
