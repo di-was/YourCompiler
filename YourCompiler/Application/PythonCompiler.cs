@@ -15,7 +15,7 @@ namespace YourCompiler.Application
         }
         public CompilerResult Compile(string code) {
 
-            ContainerDetails details = _containerDetailsRegistry.Resolve("python");
+            ContainerDetails details = _containerDetailsRegistry.Resolve("python") with { Code = code};
 
             CompilerResult result = _dockerService.runContainer(details).Result;
             return result;
