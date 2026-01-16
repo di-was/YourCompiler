@@ -15,7 +15,7 @@ builder.Services.AddSingleton<IContainerDetailsRegistry,ContainerDetailsRegistry
 builder.Services.AddScoped<IDockerService, DockerService>();
 
 // Add Factory services
-builder.Services.AddSingleton<CompilerFactory>();
+builder.Services.AddScoped<CompilerFactory>();
 
 // Add Compiler
 builder.Services.AddKeyedScoped<ICompiler, PythonCompiler>("python");

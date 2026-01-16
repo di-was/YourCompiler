@@ -1,10 +1,16 @@
 {
   "Languages": {
     "python": {
-      "Image": "python:3.12",
-      "ExecutionCommand": [ "python", "/app/main.py"],
+      "ImageName": "python:3.12",
+      "ExecutionCommand": [ "python", "/app/main.py" ],
       "FileName": "main",
-      "LanguageExtension":  ".py"
+      "LanguageExtension": "py"
+    },
+    "javascript": {
+      "ImageName": "node:20-alpine",
+      "ExecutionCommand": [ "node", "/app/main.js" ],
+      "FileName": "main",
+      "LanguageExtension": "js"
     }
   }
 }
