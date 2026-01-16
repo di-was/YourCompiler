@@ -15,7 +15,7 @@ namespace YourCompiler.Infrastructure
             string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             Directory.CreateDirectory(tempDir);
             string filePath = Path.Combine(tempDir, $"{details.FileName}.{details.LanguageExtension}");
-            await System.IO.File.WriteAllTextAsync(filePath, details.code);
+            await System.IO.File.WriteAllTextAsync(filePath, details.Code);
 
             // Create container
             var container = await client.Containers.CreateContainerAsync(new CreateContainerParameters
@@ -54,11 +54,7 @@ namespace YourCompiler.Infrastructure
             await client.Containers.RemoveContainerAsync(container.ID, new ContainerRemoveParameters());
 
 
-            CompilerResult result = new CompilerResult
-            {
-                Output = stdout,
-                Error = stderr
-            };
+            CompilerResult result = new CompilerResult(stdout, stderr);
 
             // Cleanup
             Directory.Delete(tempDir, true);

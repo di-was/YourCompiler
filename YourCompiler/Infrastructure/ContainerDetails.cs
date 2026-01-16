@@ -4,9 +4,9 @@ namespace YourCompiler.Infrastructure
 {
     public record ContainerDetails(
         string ImageName,
-        string FileName,
         string LanguageExtension,
+        string FileName,
         List<string> ExecutionCommand,
-        string code
+        string Code = ""
      );
 }
