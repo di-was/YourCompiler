@@ -1,17 +1,21 @@
 ﻿using YourCompiler.Domain;
+using YourCompiler.Infrastructure;
+using YourCompiler.Infrastructure.Interfaces;
 
 namespace YourCompiler.Application
 {
     public class CompilerFactory
     {
-        public static ICompiler CreateCompiler(string language)
+        private readonly IServiceProvider _serviceProvider;
+
+        public CompilerFactory(IServiceProvider serviceProvider)
         {
-            return language.ToLower() switch
-            {
-                "python" => new PythonCompiler(),
-                "javascript" => new JavaScriptCompiler(),
-                _ => throw new NotSupportedException($"Language '{language}' is not supported.")
-            };
+            _serviceProvider = serviceProvider;
+        }
+        public ICompiler CreateCompiler(string language)
+        {
+
+            return _serviceProvider.GetRequiredKeyedService<ICompiler>(language.ToLower());
         }
     }
 }

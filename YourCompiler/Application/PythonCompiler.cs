@@ -1,11 +1,23 @@
 ﻿using YourCompiler.Domain;
+using YourCompiler.Infrastructure;
+using YourCompiler.Infrastructure.Interfaces;
 
 namespace YourCompiler.Application
 {
     public class PythonCompiler : ICompiler
     {
+        private readonly IDockerService _dockerService;
+        private readonly IContainerDetailsRegistry _containerDetailsRegistry;
+
+        public PythonCompiler(IDockerService dockerService, IContainerDetailsRegistry containerDetailsRegistry) { 
+            this._dockerService = dockerService;
+            this._containerDetailsRegistry = containerDetailsRegistry;
+        }
         public CompilerResult Compile(string code) {
-            CompilerResult result = new CompilerResult("Hello World", null);
+
+            ContainerDetails details = _containerDetailsRegistry.Resolve("python");
+
+            CompilerResult result = _dockerService.runContainer(details).Result;
             return result;
         }
     }

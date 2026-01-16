@@ -1,0 +1,10 @@
+{
+  "Languages": {
+    "python": {
+      "Image": "python:3.12",
+      "ExecutionCommand": [ "python", "/app/main.py"],
+      "FileName": "main",
+      "LanguageExtension":  ".py"
+    }
+  }
+}

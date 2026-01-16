@@ -1,11 +1,13 @@
 ﻿using Docker.DotNet;
 using Docker.DotNet.Models;
+using YourCompiler.Domain;
+using YourCompiler.Infrastructure.Interfaces;
 
 namespace YourCompiler.Infrastructure
 {
     public class DockerService : IDockerService
     {
-        public static async Task<string> runContainer(ContainerDetails details)
+        public async Task<CompilerResult> runContainer(ContainerDetails details)
         {
             DockerClient client = new DockerClientConfiguration(new Uri("npipe://./pipe/docker_engine")).CreateClient();
 
@@ -51,12 +53,17 @@ namespace YourCompiler.Infrastructure
             // Delete container
             await client.Containers.RemoveContainerAsync(container.ID, new ContainerRemoveParameters());
 
-            string output = stdout + stderr;
+
+            CompilerResult result = new CompilerResult
+            {
+                Output = stdout,
+                Error = stderr
+            };
 
             // Cleanup
             Directory.Delete(tempDir, true);
 
-            return output;
+            return result;
         }
     }
 }

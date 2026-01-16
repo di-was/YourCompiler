@@ -1,7 +1,25 @@
+using YourCompiler.Domain;
+using YourCompiler.Infrastructure;
+using YourCompiler.Infrastructure.Interfaces;
+using YourCompiler.Application;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Add configuration
+ builder.Configuration.AddJsonFile("languages.json", optional: true, reloadOnChange: true);
+
 
 // Add services to the container.
 builder.Services.AddSwaggerGen();
+builder.Services.AddSingleton<IContainerDetailsRegistry,ContainerDetailsRegistry>();
+builder.Services.AddScoped<IDockerService, DockerService>();
+
+// Add Factory services
+builder.Services.AddSingleton<CompilerFactory>();
+
+// Add Compiler
+builder.Services.AddKeyedScoped<ICompiler, PythonCompiler>("python");
+builder.Services.AddKeyedScoped<ICompiler, JavaScriptCompiler>("javascript");
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
