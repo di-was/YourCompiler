@@ -7,18 +7,20 @@ namespace YourCompiler.Application
     public class PythonCompiler : ICompiler
     {
         private readonly IDockerService _dockerService;
-        private readonly IContainerDetailsRegistry _containerDetailsRegistry;
+        private readonly ILanguageDetailsRegistry _languageDetailsRegistry;
         private const string languageKey = "python";
 
-        public PythonCompiler(IDockerService dockerService, IContainerDetailsRegistry containerDetailsRegistry) { 
+        public PythonCompiler(IDockerService dockerService, ILanguageDetailsRegistry languageDetailsRegistry) { 
             this._dockerService = dockerService;
-            this._containerDetailsRegistry = containerDetailsRegistry;
+            this._languageDetailsRegistry = languageDetailsRegistry;
         }
-        public CompilerResult Compile(string code) {
+        public CompilerResult Compile(string code, string version) {
 
-            ContainerDetails details = _containerDetailsRegistry.Resolve(languageKey) with { Code = code};
+            LanguageConfig details = _languageDetailsRegistry.Resolve(languageKey);
 
-            CompilerResult result = _dockerService.runContainer(details).Result;
+            string versionImage = details.containerInfo.GetValueOrDefault(version, details.containerInfo[details.defaultVersion]);
+
+            CompilerResult result = _dockerService.runContainer(details, code, versionImage).Result;
             return result;
         }
     }
