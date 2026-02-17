@@ -7,21 +7,21 @@ namespace YourCompiler.Infrastructure
 {
     public class DockerService : IDockerService
     {
-        public async Task<CompilerResult> runContainer(ContainerDetails details)
+        public async Task<CompilerResult> runContainer(LanguageConfig details, string code, string versionImage)
         {
             DockerClient client = new DockerClientConfiguration(new Uri("npipe://./pipe/docker_engine")).CreateClient();
 
             // Temporary folder
             string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             Directory.CreateDirectory(tempDir);
-            string filePath = Path.Combine(tempDir, $"{details.FileName}.{details.LanguageExtension}");
-            await System.IO.File.WriteAllTextAsync(filePath, details.Code);
+            string filePath = Path.Combine(tempDir, $"main.{details.languageExtension}");
+            await System.IO.File.WriteAllTextAsync(filePath, code);
 
             // Create container
             var container = await client.Containers.CreateContainerAsync(new CreateContainerParameters
             {
-                Image = details.ImageName,
-                Cmd = details.ExecutionCommand,
+                Image = versionImage,
+                Cmd = details.executionCommand,
                 AttachStdout = true,
                 AttachStderr = true,
                 HostConfig = new HostConfig
