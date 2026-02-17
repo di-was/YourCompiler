@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.Design;
 using YourCompiler.Application;
+using YourCompiler.domain;
 using YourCompiler.Domain;
 
 namespace YourCompiler.Controllers
@@ -17,15 +18,17 @@ namespace YourCompiler.Controllers
             this._serviceProvider = serviceProvider;
         }
         [HttpPost("{language}")]
-        public IActionResult Compile(string language, [FromBody] string code)
+        public IActionResult Compile(string language, [FromBody] CompileRequest request)
         {
+            string code = request.Code;
+            string version = request.Version;
             CompilerFactory? compilerFactory = _serviceProvider.GetService<CompilerFactory>();
             if (compilerFactory == null)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "CompilerFactory service not found.");
             }
             ICompiler compiler = compilerFactory.CreateCompiler(language);
-            CompilerResult result = compiler.Compile(code);
+            CompilerResult result = compiler.Compile(code, version);
 
           
 
