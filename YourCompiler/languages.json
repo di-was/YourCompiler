@@ -1,16 +1,21 @@
 {
   "Languages": {
-    "python": {
-      "ImageName": "python:3.12",
-      "ExecutionCommand": [ "python", "/app/main.py" ],
-      "FileName": "main",
-      "LanguageExtension": "py"
-    },
-    "javascript": {
-      "ImageName": "node:20-alpine",
-      "ExecutionCommand": [ "node", "/app/main.js" ],
-      "FileName": "main",
-      "LanguageExtension": "js"
+    "availableLanguages": [ "python", "javascript" ],
+    "configs": {
+      "python": {
+        "languageExtension": "py",
+        "executionCommand": [ "python", "/app/main.py" ],
+        "availableVersions": [ "3.12" ],
+        "defaultVersion": "3.12",
+        "containerInfo": { "3.12": "python:3.12" }
+      },
+      "javascript": {
+        "languageExtension": "js",
+        "executionCommand": [ "node", "/app/main.js" ],
+        "availableVersions": [ "20-alpine" ],
+        "defaultVersion": "20-alpine",
+        "containerInfo": { "20-alpine": "node:20-alpine" }
+      }
     }
   }
 }
