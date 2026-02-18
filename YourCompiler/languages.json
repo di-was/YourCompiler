@@ -7,14 +7,16 @@
         "executionCommand": [ "python", "/app/main.py" ],
         "availableVersions": [ "3.12" ],
         "defaultVersion": "3.12",
-        "containerInfo": { "3.12": "python:3.12" }
+        "containerInfo": { "3.12": "python:3.12" },
+        "skeletonCode":  "#### python interpreter by yourcompiler.com ####\nprint('hello yourcompiler.com')"
       },
       "javascript": {
         "languageExtension": "js",
         "executionCommand": [ "node", "/app/main.js" ],
         "availableVersions": [ "20-alpine" ],
         "defaultVersion": "20-alpine",
-        "containerInfo": { "20-alpine": "node:20-alpine" }
+        "containerInfo": { "20-alpine": "node:20-alpine" },
+        "skeletonCode": "//// javascript interpreter by yourcompiler.com ////\nconsole.log('hello yourcompiler.com');"
       }
     }
   }
