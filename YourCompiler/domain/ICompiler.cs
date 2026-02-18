@@ -4,6 +4,6 @@ namespace YourCompiler.Domain
 {
     public interface ICompiler
     {
-        public CompilerResult Compile(string code);
+        public CompilerResult Compile(string code, string version);
     }
 }
