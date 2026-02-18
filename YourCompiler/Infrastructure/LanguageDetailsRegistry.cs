@@ -1,4 +1,5 @@
 ﻿using YourCompiler.Infrastructure.Interfaces;
+using YourCompiler.Infrastructure;
 
 namespace YourCompiler.Infrastructure
 {
@@ -33,16 +34,20 @@ namespace YourCompiler.Infrastructure
 
         public AvailableLanguagesDTO GetAvailableLanguages()
         {
-            var languagesToDefaultVersionMap = new Dictionary<string, string>();
-            var languagesToAvailableVersionMap = new Dictionary<string, string[]>();
+            var res = new Dictionary<string, languageInfo>();
             foreach (var kvp in _languagesConfig.configs)
             {
                 string language = kvp.Key;
                 LanguageConfig config = kvp.Value;
-                languagesToDefaultVersionMap[language] = config.defaultVersion;
-                languagesToAvailableVersionMap[language] = config.availableVersions;
+                res[language] = new languageInfo
+                (
+                    defaultVersion: config.defaultVersion,
+                    availableVersions: config.availableVersions,
+                    skeletonCode: config.skeletonCode
+                );
+
             }
-            return new AvailableLanguagesDTO(languagesToDefaultVersionMap, languagesToAvailableVersionMap);
+            return new AvailableLanguagesDTO(res);
         }
     }
 }

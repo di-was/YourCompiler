@@ -8,7 +8,8 @@ namespace YourCompiler.Infrastructure
         string[] executionCommand,
         string defaultVersion,
         string[] availableVersions,
-        Dictionary<string, string> containerInfo
+        Dictionary<string, string> containerInfo,
+        string skeletonCode
         );
 
     public record LanguagesConfig(
