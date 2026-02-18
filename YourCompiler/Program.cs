@@ -2,6 +2,7 @@ using YourCompiler.Domain;
 using YourCompiler.Infrastructure;
 using YourCompiler.Infrastructure.Interfaces;
 using YourCompiler.Application;
+using YourCompiler.Application.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 

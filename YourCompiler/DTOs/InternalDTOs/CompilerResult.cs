@@ -1,4 +1,4 @@
-﻿namespace YourCompiler.Domain
+﻿namespace YourCompiler.DTOs.InternalDTOs
 {
     public record CompilerResult(
         string? Output,

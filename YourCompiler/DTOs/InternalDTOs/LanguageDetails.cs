@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 
-namespace YourCompiler.Infrastructure
+namespace YourCompiler.DTOs.InternalDTOs
 {
 
     public record LanguageConfig(

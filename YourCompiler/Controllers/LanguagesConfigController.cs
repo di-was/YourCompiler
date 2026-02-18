@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using YourCompiler.Infrastructure;
-using YourCompiler.Infrastructure.Interfaces;
+using YourCompiler.Application.Interfaces;
+using YourCompiler.DTOs.ResponseDTOs;
 
 namespace YourCompiler.Controllers
 {

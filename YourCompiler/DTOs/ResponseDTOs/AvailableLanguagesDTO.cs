@@ -1,4 +1,4 @@
-﻿namespace YourCompiler.Infrastructure
+﻿namespace YourCompiler.DTOs.ResponseDTOs
 {
     public record languageInfo(
         string defaultVersion,

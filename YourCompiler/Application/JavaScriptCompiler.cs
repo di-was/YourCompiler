@@ -1,5 +1,6 @@
-﻿using YourCompiler.Domain;
-using YourCompiler.Infrastructure;
+﻿using YourCompiler.Application.Interfaces;
+using YourCompiler.Domain;
+using YourCompiler.DTOs.InternalDTOs;
 using YourCompiler.Infrastructure.Interfaces;
 
 namespace YourCompiler.Application

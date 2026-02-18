@@ -1,4 +1,4 @@
-﻿namespace YourCompiler.domain
+﻿namespace YourCompiler.DTOs.RequestDTOs
 {
     public record CompileRequest
     {

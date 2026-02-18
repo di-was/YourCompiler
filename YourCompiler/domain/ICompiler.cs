@@ -1,4 +1,4 @@
-﻿using YourCompiler.Domain;
+﻿using YourCompiler.DTOs.InternalDTOs;
 
 namespace YourCompiler.Domain
 {

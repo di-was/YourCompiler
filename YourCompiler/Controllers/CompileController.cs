@@ -2,8 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.Design;
 using YourCompiler.Application;
-using YourCompiler.domain;
 using YourCompiler.Domain;
+using YourCompiler.DTOs.InternalDTOs;
+using YourCompiler.DTOs.RequestDTOs;
 
 namespace YourCompiler.Controllers
 {

@@ -1,7 +1,8 @@
-﻿using YourCompiler.Infrastructure.Interfaces;
-using YourCompiler.Infrastructure;
+﻿using YourCompiler.DTOs.ResponseDTOs;
+using YourCompiler.DTOs.InternalDTOs;
+using YourCompiler.Application.Interfaces;
 
-namespace YourCompiler.Infrastructure
+namespace YourCompiler.Application
 {
     public class LanguageDetailsRegistry : ILanguageDetailsRegistry
     {

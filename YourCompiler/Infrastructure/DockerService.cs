@@ -1,6 +1,6 @@
 ﻿using Docker.DotNet;
 using Docker.DotNet.Models;
-using YourCompiler.Domain;
+using YourCompiler.DTOs.InternalDTOs;
 using YourCompiler.Infrastructure.Interfaces;
 
 namespace YourCompiler.Infrastructure
