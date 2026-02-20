@@ -7,6 +7,12 @@ namespace YourCompiler.Infrastructure
 {
     public class DockerService : IDockerService
     {
+        // Sandbox limitations
+        private static readonly TimeSpan DefaultTimout = TimeSpan.FromSeconds(5);
+        private const long MemoryLimit = 64 * 1024 * 1024;
+        private const long MemorySwapLimit = 64 * 1024 * 1024;
+        private const long NanoCPUs = 1_000_000_000;
+        private const long PidsLimit = 10;
         public async Task<CompilerResult> runContainer(LanguageConfig details, string code, string versionImage)
         {
             DockerClient client = new DockerClientConfiguration(new Uri("npipe://./pipe/docker_engine")).CreateClient();
