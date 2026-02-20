@@ -8,64 +8,167 @@ namespace YourCompiler.Infrastructure
     public class DockerService : IDockerService
     {
         // Sandbox limitations
-        private static readonly TimeSpan DefaultTimout = TimeSpan.FromSeconds(5);
-        private const long MemoryLimit = 64 * 1024 * 1024;
-        private const long MemorySwapLimit = 64 * 1024 * 1024;
+        private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(5);
+        private const long MemoryLimit = 256 * 1024 * 1024;
+        private const long MemorySwapLimit = 256 * 1024 * 1024;
         private const long NanoCPUs = 1_000_000_000;
-        private const long PidsLimit = 10;
+        private const long PidsLimit = 32;
         public async Task<CompilerResult> runContainer(LanguageConfig details, string code, string versionImage)
         {
-            DockerClient client = new DockerClientConfiguration(new Uri("npipe://./pipe/docker_engine")).CreateClient();
+            // Execution Directory and Sandbox Identifier
+            string? tempDir = null;
+            string? containerId = null;
 
-            // Temporary folder
-            string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            Directory.CreateDirectory(tempDir);
-            string filePath = Path.Combine(tempDir, $"main.{details.languageExtension}");
-            await System.IO.File.WriteAllTextAsync(filePath, code);
+            DockerClient client = new DockerClientConfiguration(
+                new Uri("npipe://./pipe/docker_engine")
+                ).CreateClient();
 
-            // Create container
-            var container = await client.Containers.CreateContainerAsync(new CreateContainerParameters
+            try
             {
-                Image = versionImage,
-                Cmd = details.executionCommand,
-                AttachStdout = true,
-                AttachStderr = true,
-                HostConfig = new HostConfig
+                // Temporary folder creation and code injection
+                tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+                Directory.CreateDirectory(tempDir);
+
+                var filePath = Path.Combine(tempDir, $"main.{details.languageExtension}");
+                await File.WriteAllTextAsync(filePath, code);
+
+
+                var hostConfig = new HostConfig
                 {
                     AutoRemove = false,
-                    Binds = new List<string> { $"{tempDir}:/app" }
-                }
-            });
 
-            // Start container
-            await client.Containers.StartContainerAsync(container.ID, null);
+                    // resource limits
+                    Memory = MemoryLimit,
+                    MemorySwap = MemorySwapLimit,
+                    NanoCPUs = NanoCPUs,
+                    PidsLimit = PidsLimit,
 
-            // Wait for container to finish
-            var waitResponse = await client.Containers.WaitContainerAsync(container.ID);
+                    // block network access
+                    NetworkMode = "none",
 
-            // Get logs after it finished
-            var logs = await client.Containers.GetContainerLogsAsync(
-                container.ID,
-                false,
-                new ContainerLogsParameters
+                    // I/O isolation
+                    ReadonlyRootfs = false,
+                    Binds = new List<string> { $"{tempDir}:/app:ro" },
+
+                    Tmpfs = new Dictionary<string, string>
+                    {
+                        { "/tmp", "rw,noexec,nosuid,size=64m" }
+                    }
+                };
+
+                // create container
+                var createResponse = await client.Containers.CreateContainerAsync(new CreateContainerParameters
                 {
-                    ShowStdout = true,
-                    ShowStderr = true,
+                    Image = versionImage,
+                    Cmd = details.executionCommand,
+                    WorkingDir = "/app",
+                    AttachStdout = true,
+                    AttachStderr = true,
+                    User = "nobody",
+                    HostConfig = hostConfig
+                });
+
+                containerId = createResponse.ID;
+
+                // start container
+                await client.Containers.StartContainerAsync(containerId, new ContainerStartParameters());
+
+                // timout enforcement
+                var startedAt = DateTime.UtcNow;
+
+                var waitTask = client.Containers.WaitContainerAsync(containerId);
+                var timeoutTask = Task.Delay(DefaultTimeout);
+
+                var completed = await Task.WhenAny(waitTask, timeoutTask);
+                var elapsedMs = (DateTime.UtcNow - startedAt).TotalMilliseconds;
+
+                bool timedOut = completed == timeoutTask;
+
+                if (timedOut)
+                {
+                    Console.WriteLine("timeout");
+                    try
+                    {
+                        await client.Containers.StopContainerAsync(containerId, new ContainerStopParameters { WaitBeforeKillSeconds = 1 });
+                    }
+                    catch
+                    {
+                        // forcefully kill if doesn't stop gracefully
+                 
+                    }
+                    try
+                    {
+                        var inspect = await client.Containers.InspectContainerAsync(containerId);
+                        if (inspect?.State?.Running == true)
+                        {
+                            await client.Containers.KillContainerAsync(containerId, new ContainerKillParameters());
+                        }
+                    }
+                    catch
+                    {
+                        // ignore - cleanup will force remove
+                    }
                 }
-            );
-
-            var (stdout, stderr) = await logs.ReadOutputToEndAsync(CancellationToken.None);
-
-            // Delete container
-            await client.Containers.RemoveContainerAsync(container.ID, new ContainerRemoveParameters());
+                
 
 
-            CompilerResult result = new CompilerResult(stdout, stderr);
+                // retrieve logs
+                var logsStream = await client.Containers.GetContainerLogsAsync(
+                    containerId,
+                    false,
+                    new ContainerLogsParameters
+                    {
+                        ShowStderr = true,
+                        ShowStdout = true,
+                        Tail = "2000"
+                    }
+                    );
 
-            // Cleanup
-            Directory.Delete(tempDir, true);
+                using var logCts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+                var (stdout, stderr) = await logsStream.ReadOutputToEndAsync(CancellationToken.None);
+                var elaspedMs = (DateTime.UtcNow - startedAt).TotalMilliseconds;
+                if (timedOut)
+                {
+                    stderr = (stderr ?? "") + $"\n[debug] timedOut={timedOut}, timeoutMs={DefaultTimeout.TotalMilliseconds}, elapsedMs={elapsedMs}";
+                } 
 
-            return result;
+                
+
+                return new CompilerResult(stdout, stderr);
+            }
+            finally
+            {
+                if (!string.IsNullOrEmpty(containerId))
+                {
+                    try
+                    {
+                        // Force remove if still exists
+                        await client.Containers.RemoveContainerAsync(containerId, new ContainerRemoveParameters { Force = true });
+                    }
+                    catch
+                    {
+                        // potential log for future use cases
+                    }
+
+
+                }
+
+                if (!string.IsNullOrEmpty(tempDir))
+                {
+                    try
+                    {
+                        Directory.Delete(tempDir, recursive: true);
+
+                    }
+                    catch
+                    {
+                        // potential log for future use cases
+
+
+                    }
+                }
+
+            }
         }
     }
 }
