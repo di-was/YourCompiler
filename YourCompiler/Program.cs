@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
+using YourCompiler.Application;
+using YourCompiler.Application.Interfaces;
 using YourCompiler.Domain;
 using YourCompiler.Infrastructure;
 using YourCompiler.Infrastructure.Interfaces;
-using YourCompiler.Application;
-using YourCompiler.Application.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,10 +27,10 @@ builder.Services.AddKeyedScoped<ICompiler, JavaScriptCompiler>("javascript");
 // allow cors from frontend 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowNext", policy =>
+    options.AddPolicy("AllowAll", policy =>
     {
         policy
-            .WithOrigins("http://localhost:3000")
+            .AllowAnyOrigin()
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -38,8 +40,46 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// configure Rate Limiter
+
+builder.Services.AddRateLimiter(options =>
+{
+    // compile limiter
+    options.AddPolicy("Compile", context => {
+        var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+        return RateLimitPartition.GetFixedWindowLimiter(ip, _ =>
+            new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 30,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+
+    });
+
+    // global limiter
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+    {
+        var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        return RateLimitPartition.GetFixedWindowLimiter(ip, _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 100,
+            Window = TimeSpan.FromMinutes(1),
+            QueueLimit = 0
+        });
+    });
+
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+});
+
 var app = builder.Build();
-app.UseCors("AllowNext");
+app.UseCors("AllowAll");
+
+
+// use rate limiter
+app.UseRateLimiter();   
 
 
 // Configure the HTTP request pipeline.
