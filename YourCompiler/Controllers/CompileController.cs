@@ -21,6 +21,7 @@ namespace YourCompiler.Controllers
         }
         [HttpPost("{language}")]
         [EnableRateLimiting("Compile")]
+        [RequestSizeLimit(30*1024)]
         public IActionResult Compile(string language, [FromBody] CompileRequest request)
         {
             string code = request.Code;
