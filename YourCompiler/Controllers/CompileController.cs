@@ -5,6 +5,7 @@ using YourCompiler.Application;
 using YourCompiler.Domain;
 using YourCompiler.DTOs.InternalDTOs;
 using YourCompiler.DTOs.RequestDTOs;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace YourCompiler.Controllers
 {
@@ -19,6 +20,7 @@ namespace YourCompiler.Controllers
             this._serviceProvider = serviceProvider;
         }
         [HttpPost("{language}")]
+        [EnableRateLimiting("Compile")]
         public IActionResult Compile(string language, [FromBody] CompileRequest request)
         {
             string code = request.Code;
