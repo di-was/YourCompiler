@@ -19,12 +19,6 @@ namespace YourCompiler.Application
         {
             LanguageConfig? details = null;
 
-            foreach (var kvp in _languagesConfig.configs)
-            {
-                Console.WriteLine($"key: {kvp.Key}, value: {kvp.Value}");
-            }
-            Console.WriteLine(_languagesConfig.configs.Count);
-
             if (!_languagesConfig.configs.TryGetValue(language, out details))
             {
                 throw new Exception($"Unsupported {language} Language");
