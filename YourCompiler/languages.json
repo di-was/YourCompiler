@@ -8,7 +8,7 @@
         "availableVersions": [ "3.12" ],
         "defaultVersion": "3.12",
         "containerInfo": { "3.12": "python:3.12" },
-        "skeletonCode":  "#### python interpreter by yourcompiler.com ####\nprint('hello yourcompiler.com')"
+        "skeletonCode": "#### python interpreter by yourcompiler.com ####\nprint('hello yourcompiler.com')"
       },
       "javascript": {
         "languageExtension": "js",
@@ -17,7 +17,41 @@
         "defaultVersion": "20-alpine",
         "containerInfo": { "20-alpine": "node:20-alpine" },
         "skeletonCode": "//// javascript interpreter by yourcompiler.com ////\nconsole.log('hello yourcompiler.com');"
+      },
+      "c": {
+        "languageExtension": "c",
+        "executionCommand": [
+          "sh",
+          "-c",
+          "gcc /app/main.c -O2 -std=c11 -o /app/main && /app/main"
+        ],
+        "availableVersions": [ "gcc-latest" ],
+        "defaultVersion": "gcc-latest",
+        "containerInfo": { "gcc-latest": "gcc:latest" },
+        "skeletonCode": "/* C compiler by yourcompiler.com */\n#include <stdio.h>\n\nint main(void) {\n    printf(\"hello yourcompiler.com\\n\");\n    return 0;\n}"
+      },
+
+      "cpp": {
+        "languageExtension": "cpp",
+        "executionCommand": [
+          "sh",
+          "-c",
+          "g++ /app/main.cpp -O2 -std=c++20 -o /app/main && /app/main"
+        ],
+        "availableVersions": [ "gcc-latest" ],
+        "defaultVersion": "gcc-latest",
+        "containerInfo": { "gcc-latest": "gcc:latest" },
+        "skeletonCode": "// C++ compiler by yourcompiler.com\n#include <iostream>\n\nint main() {\n    std::cout << \"hello yourcompiler.com\" << std::endl;\n    return 0;\n}"
       }
+      /*"csharp": {
+        "languageExtension": "cs",
+        "executionCommand": [ "dotnet", "run" ],
+        "availableVersions": [ "8.0" ],
+        "defaultVersion": "8.0",
+        "containerInfo": { "8.0": "mcr.microsoft.com/dotnet/sdk:8.0" },
+        "skeletonCode": "//// C# interpreter by yourcompiler.com ////\nusing System;\n\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine(\"hello yourcompiler.com\");\n    }\n}"
+      }
+      */
     }
   }
 }

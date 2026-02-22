@@ -23,6 +23,9 @@ builder.Services.AddScoped<CompilerFactory>();
 // Add Compiler
 builder.Services.AddKeyedScoped<ICompiler, PythonCompiler>("python");
 builder.Services.AddKeyedScoped<ICompiler, JavaScriptCompiler>("javascript");
+builder.Services.AddKeyedScoped<ICompiler, CSharpCompiler>("csharp");
+builder.Services.AddKeyedScoped<ICompiler, CCompiler>("c");
+builder.Services.AddKeyedScoped<ICompiler, CppCompiler>("cpp");
 
 // allow cors from frontend 
 builder.Services.AddCors(options =>
