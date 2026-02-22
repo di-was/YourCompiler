@@ -2,6 +2,7 @@
 using Docker.DotNet.Models;
 using YourCompiler.DTOs.InternalDTOs;
 using YourCompiler.Infrastructure.Interfaces;
+using System.Runtime.InteropServices;
 
 namespace YourCompiler.Infrastructure
 {
@@ -20,7 +21,9 @@ namespace YourCompiler.Infrastructure
             string? containerId = null;
 
             DockerClient client = new DockerClientConfiguration(
-                new Uri("npipe://./pipe/docker_engine")
+                RuntimeInformation.IsOSPlatform(OSPlatform.Windows) 
+                ? new Uri("npipe://./pipe/docker_engine")
+                : new Uri("unix:///var/run/docker.sock")
                 ).CreateClient();
 
             try
@@ -48,7 +51,7 @@ namespace YourCompiler.Infrastructure
 
                     // I/O isolation
                     ReadonlyRootfs = false,
-                    Binds = new List<string> { $"{tempDir}:/app:ro" },
+                    Binds = new List<string> { $"{tempDir}:/app" },
 
                     Tmpfs = new Dictionary<string, string>
                     {
